@@ -5,10 +5,12 @@ import com.apgroup.blogapp.entities.User;
 import com.apgroup.blogapp.exceptions.ResourceNotFoundException;
 import com.apgroup.blogapp.repsitory.UserRepo;
 import com.apgroup.blogapp.services.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +18,9 @@ public class UserServiceImp implements UserService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public UserDto createUser(UserDto userDto) {
@@ -40,6 +45,9 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserDto getUserById(Integer userId) {
+//        Optional<User> user = userRepo.findById(userId);
+//        User user1 = user.get();
+        // findById returns Optional<T> type
         User user = userRepo.findById(userId)
                 .orElseThrow(()->new ResourceNotFoundException("User","Id", userId));
 
@@ -60,8 +68,14 @@ public class UserServiceImp implements UserService {
         userRepo.delete(user);
 
     }
+    private User userDtoToUser(UserDto userDto){
+        return this.modelMapper.map(userDto, User.class);
+    }
+    private UserDto userToUserDto(User user){
+        return this.modelMapper.map(user,UserDto.class);
+    }
 
-
+/*
     private User userDtoToUser(UserDto userDto){
         User user=new User(userDto.getId(), userDto.getName(), userDto.getEmail(),
                 userDto.getPassword(), userDto.getAbout());
@@ -76,4 +90,5 @@ public class UserServiceImp implements UserService {
         userDto.setAbout(user.getAbout());
         return userDto;
     }
+ */
 }
