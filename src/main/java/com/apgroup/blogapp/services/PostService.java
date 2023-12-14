@@ -1,10 +1,7 @@
 package com.apgroup.blogapp.services;
 
-import com.apgroup.blogapp.dto.CategoryDto;
 import com.apgroup.blogapp.dto.PostDto;
-import com.apgroup.blogapp.entities.Category;
-import com.apgroup.blogapp.entities.Post;
-import com.apgroup.blogapp.entities.User;
+import com.apgroup.blogapp.payload.PostResponse;
 
 import java.util.List;
 
@@ -17,6 +14,8 @@ public interface PostService {
     void deletePost(int postId);
 
     PostDto getPost(int postId);
+
+    PostResponse getPosts(int pN , int pS);
 
     List<PostDto> getAllPosts();
 

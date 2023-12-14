@@ -3,6 +3,7 @@ package com.apgroup.blogapp.controller;
 
 import com.apgroup.blogapp.dto.CategoryDto;
 import com.apgroup.blogapp.dto.PostDto;
+import com.apgroup.blogapp.payload.PostResponse;
 import com.apgroup.blogapp.services.PostService;
 import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +46,22 @@ public class PostController {
         return new ResponseEntity<>(postDto,HttpStatus.OK);
     }
 
+    // @RequestParam for query parameter
+    // api?pageNumber=1&pageSize=10
+    // pageNumber starts from 0
+    //    required = false  if value is not there use default value
+    // eg. total record=5 , pn=1 ps=3 means on page 0 record=3 and on page 1 you have remaining 2 record
+    @GetMapping("/posts")
+    public ResponseEntity<PostResponse> getPosts(
+            @RequestParam(value = "pageNumber" , defaultValue = "0" , required = false) Integer pageNumber,
+            @RequestParam(value = "pageSize" , defaultValue = "5" , required = false) Integer pageSize)
+    {
+        PostResponse postResponse = postService.getPosts(pageNumber,pageSize);
+        return new ResponseEntity<>(postResponse,HttpStatus.OK);
+    }
+
     @GetMapping("/posts/all")
-    public ResponseEntity<List<PostDto>> getAllPost(){
+    public ResponseEntity<List<PostDto>> getAllPost() {
         List<PostDto> postDtoList = postService.getAllPosts();
         return new ResponseEntity<>(postDtoList,HttpStatus.OK);
     }
