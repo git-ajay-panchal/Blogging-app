@@ -14,10 +14,7 @@ import com.apgroup.blogapp.repsitory.UserRepo;
 import com.apgroup.blogapp.services.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -91,10 +88,12 @@ public class PostServiceImp implements PostService{
     }
 
     @Override
-    public PostResponse getPosts(int pN, int pS) {
+    public PostResponse getPosts(int pN, int pS,String sortBy) {
         //Adding pagination
+        String sortDir = "desc"; // could be arg.
+        Sort sort = (sortDir.equalsIgnoreCase("desc")?Sort.by(sortBy).descending():Sort.by(sortBy).ascending());
 
-        Pageable pageable = PageRequest.of(pN,pS,Sort.by("title"));
+        Pageable pageable = PageRequest.of(pN,pS,sort);//Sort.by(sortBy).descending()
         Page<Post> pagePost = postRepo.findAll(pageable);
         List<Post> postList = pagePost.getContent();
         List<PostDto> postDtoList = postList.stream().map(this::postEnToPostDto).collect(Collectors.toList()); //map(x->postEnToPostDto(x))
@@ -110,11 +109,23 @@ public class PostServiceImp implements PostService{
     }
 
     @Override
-    public List<PostDto> getAllPostsByUser(Integer userId) {
+    public PostResponse getAllPostsByUser(Integer userId, int pN , int pS) {
         User user = userRepo.findById(userId).
                 orElseThrow(()->new ResourceNotFoundException("user","id",userId));
-        List<Post> postList = postRepo.findByUser(user);
-        return postList.stream().map(this::postEnToPostDto).collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(pN,pS);
+        List<Post> postList = postRepo.findByUser(user,pageable);
+        Page<Post> postPage = new PageImpl<Post>(postList,pageable,postList.size());
+        List<PostDto> postDtoList = postList.stream().map(this::postEnToPostDto).collect(Collectors.toList());
+        System.out.println("========="+postDtoList);
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(postDtoList);
+        postResponse.setPageNum(postPage.getNumber());
+        postResponse.setPageSize(postPage.getSize());
+        postResponse.setTotalElements(postPage.getTotalElements());
+        postResponse.setTotalPages(postPage.getTotalPages());
+        postResponse.setLastPage(postPage.isLast());
+
+        return postResponse;
     }
 
     @Override
@@ -122,6 +133,18 @@ public class PostServiceImp implements PostService{
         Category category = categoryRepo.findById(cartId).
                 orElseThrow(()->new ResourceNotFoundException("category","id",cartId));
         List<Post> postList = postRepo.findByCategory(category);
+        return postList.stream().map(this::postEnToPostDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostDto> searchPostsByTitle(String title) {
+         List<Post> postList = postRepo.findByTitle(title);
+         return postList.stream().map(this::postEnToPostDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostDto> searchPostsByKeywordTitle(String keyword) {
+        List<Post> postList = postRepo.searchByTitle("%"+keyword+"%"); // ****
         return postList.stream().map(this::postEnToPostDto).collect(Collectors.toList());
     }
 

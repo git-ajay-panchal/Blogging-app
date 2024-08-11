@@ -2,16 +2,15 @@ package com.apgroup.blogapp.entities;
 
 
 import javafx.geometry.Pos;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")   // need to use table name as users bcoz "User" in postgres is a

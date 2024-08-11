@@ -1,13 +1,12 @@
 package com.apgroup.blogapp.dto;
 
-import com.apgroup.blogapp.entities.Category;
-import com.apgroup.blogapp.entities.User;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -35,4 +34,6 @@ public class PostDto {
     // like yaha category ke andr fir se post ki list he same with user
 //    private Category category;
 //    private User user;
+
+    private Set<CommentDto> comments = new HashSet<>();
 }

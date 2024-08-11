@@ -15,10 +15,14 @@ public interface PostService {
 
     PostDto getPost(int postId);
 
-    PostResponse getPosts(int pN , int pS);
+    PostResponse getPosts(int pN , int pS, String sortBy);
 
     List<PostDto> getAllPosts();
 
-    List<PostDto> getAllPostsByUser(Integer userId);
+    PostResponse getAllPostsByUser(Integer userId,int pN , int pS);
     List<PostDto> getAllPostsByCategory(Integer cartId);
+
+    List<PostDto> searchPostsByTitle(String title);
+
+    List<PostDto> searchPostsByKeywordTitle(String keyword);
 }
